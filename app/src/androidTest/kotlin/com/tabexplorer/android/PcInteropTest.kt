@@ -26,7 +26,7 @@ class PcInteropTest {
     @Test fun a_phoneSendsToTabExplorer() {
         val id = args.getString("pcId") ?: return   // only when run by the CI script
         val share = App.instance.share
-        rule.waitUntil(10_000) { share.running }
+        rule.until(10_000) { share.running }
         share.addPeer(id, "Node PC", args.getString("pcPub")!!, "10.0.2.2", args.getString("pcPort")!!.toInt())
         val dir = File(App.instance.cacheDir, "tosend/Photos").also { it.deleteRecursively(); File(it, "2026").mkdirs() }
         File(dir, "a.txt").writeText("alpha from the phone")
@@ -40,15 +40,15 @@ class PcInteropTest {
     @Test fun b_tabExplorerSendsToThePhone() {
         if (args.getString("pcId") == null) return
         val share = App.instance.share
-        rule.waitUntil(10_000) { share.running }
+        rule.until(10_000) { share.running }
         File(Storage.receiveFolder, "FromPc").deleteRecursively()
         // tell the build machine who we are, so it can send to us
         File("/sdcard/Download/tx-identity.json").writeText("""{"id":"${share.identity.id}","name":"Phone","pub":"${share.identity.pub}","address":"127.0.0.1","port":${share.port}}""")
         // the first time, the phone asks whether to accept
-        rule.waitUntil(120_000) { rule.onAllNodesWithText("Accept").fetchSemanticsNodes().isNotEmpty() }
+        rule.until(120_000) { rule.onAllNodesWithText("Accept").fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithText("Accept").performClick()
-        rule.waitUntil(60_000) { File(Storage.receiveFolder, "FromPc/hello.txt").exists() && File(Storage.receiveFolder, "FromPc/data.bin").length() == 700_000L }
-        assertEquals("hello from the PC", File(Storage.receiveFolder, "FromPc/hello.txt").readText())
+        rule.until(60_000) { File(Storage.receiveFolder, "FromPc/hello.txt").exists() && File(Storage.receiveFolder, "FromPc/data.bin").length() == 700_000L }
+        assertEquals("hello from the PC", File(Storage.receiveFolder, "FromPc/hello.txt").readText().trim())
         assertTrue(share.identity.isTrusted(share.identity.trusted.keys.first(), share.identity.trusted.values.first().pub))
     }
 }

@@ -29,12 +29,12 @@ class AppTest {
 
     private fun openRoot() {
         rule.onNodeWithText("Phone").performClick()
-        rule.waitUntil(10_000) { rule.onAllNodesWithText("AAATx").fetchSemanticsNodes().isNotEmpty() }
+        rule.until(10_000) { rule.onAllNodesWithText("AAATx").fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithText("AAATx").performClick()
-        rule.waitUntil(10_000) { rule.onAllNodesWithText("a.txt").fetchSemanticsNodes().isNotEmpty() }
+        rule.until(10_000) { rule.onAllNodesWithText("a.txt").fetchSemanticsNodes().isNotEmpty() }
     }
-    private fun waitText(t: String, ms: Long = 10_000) = rule.waitUntil(ms) { rule.onAllNodesWithText(t, substring = true).fetchSemanticsNodes().isNotEmpty() }
-    private fun waitGone(t: String, ms: Long = 10_000) = rule.waitUntil(ms) { rule.onAllNodesWithText(t).fetchSemanticsNodes().isEmpty() }
+    private fun waitText(t: String, ms: Long = 10_000) = rule.until(ms) { rule.onAllNodesWithText(t, substring = true).fetchSemanticsNodes().isNotEmpty() }
+    private fun waitGone(t: String, ms: Long = 10_000) = rule.until(ms) { rule.onAllNodesWithText(t).fetchSemanticsNodes().isEmpty() }
 
     @Test fun homeShowsStorageAndPlaces() {
         rule.onNodeWithText("TabExplorer").assertIsDisplayed()
@@ -71,7 +71,7 @@ class AppTest {
         rule.onNodeWithText("sub").performClick()
         waitText("This folder is empty")
         rule.onNodeWithText("Paste here").performClick()
-        rule.waitUntil(15_000) { File(root, "sub/b.txt").exists() }
+        rule.until(15_000) { File(root, "sub/b.txt").exists() }
         assertEquals("hello b", File(root, "sub/b.txt").readText())
         assertTrue(File(root, "b.txt").exists())
     }
@@ -83,7 +83,7 @@ class AppTest {
         rule.onNodeWithText("sub").performClick()
         waitText("This folder is empty")
         rule.onNodeWithText("Paste here").performClick()
-        rule.waitUntil(15_000) { File(root, "sub/b.txt").exists() }
+        rule.until(15_000) { File(root, "sub/b.txt").exists() }
         assertFalse(File(root, "b.txt").exists())
     }
 
@@ -93,14 +93,14 @@ class AppTest {
         rule.onNodeWithText("New folder").performClick()
         rule.onNode(hasSetTextAction()).performTextInput("Fresh")
         rule.onNodeWithText("Create").performClick()
-        rule.waitUntil(10_000) { File(root, "Fresh").isDirectory }
+        rule.until(10_000) { File(root, "Fresh").isDirectory }
         waitText("Fresh")
         rule.onNodeWithText("a.txt").performTouchInput { longClick() }
         rule.onNodeWithContentDescription("More").performClick()
         rule.onNodeWithText("Rename").performClick()
         rule.onNode(hasSetTextAction()).performTextReplacement("renamed.txt")
         rule.onAllNodesWithText("Rename").onLast().performClick()
-        rule.waitUntil(10_000) { File(root, "renamed.txt").exists() }
+        rule.until(10_000) { File(root, "renamed.txt").exists() }
         assertFalse(File(root, "a.txt").exists())
     }
 
@@ -110,7 +110,7 @@ class AppTest {
         waitText("hello a")
         rule.onNode(hasSetTextAction()).performTextReplacement("changed")
         rule.onNodeWithContentDescription("Save").performClick()
-        rule.waitUntil(10_000) { File(root, "a.txt").readText() == "changed" }
+        rule.until(10_000) { File(root, "a.txt").readText() == "changed" }
     }
 
     @Test fun photoOpensInTheViewer() {
@@ -128,7 +128,7 @@ class AppTest {
         File(root, "doc.pdf").outputStream().use { doc.writeTo(it) }; doc.close()
         openRoot()
         rule.onNodeWithText("doc.pdf").performClick()
-        rule.waitUntil(10_000) { rule.onAllNodesWithContentDescription("Page 1").fetchSemanticsNodes().isNotEmpty() }
+        rule.until(10_000) { rule.onAllNodesWithContentDescription("Page 1").fetchSemanticsNodes().isNotEmpty() }
     }
 
     @Test fun musicPlaysInTheBackgroundService() {
@@ -136,9 +136,9 @@ class AppTest {
         openRoot()
         rule.onNodeWithText("tone.wav").performClick()
         waitText("Now playing")
-        rule.waitUntil(15_000) { Player.count == 1 && Player.playing }
+        rule.until(15_000) { Player.count == 1 && Player.playing }
         rule.onNodeWithContentDescription("Play/pause").performClick()
-        rule.waitUntil(5_000) { !Player.playing }
+        rule.until(5_000) { !Player.playing }
         // leave the screen: the music service (and its media session) still exist
         androidx.test.espresso.Espresso.pressBack()
         assertEquals(1, Player.count)
@@ -149,7 +149,7 @@ class AppTest {
         rule.onNodeWithContentDescription("Recycle Bin").performClick()
         waitText("b.txt")
         rule.onNodeWithContentDescription("Restore").performClick()
-        rule.waitUntil(10_000) { File(root, "b.txt").exists() }
+        rule.until(10_000) { File(root, "b.txt").exists() }
     }
 
     @Test fun sharingScreenShowsCodeAndSwitch() {
