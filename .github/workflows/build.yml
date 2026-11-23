@@ -23,7 +23,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.10.2' }
       - name: Sharing tests (our code against TabExplorer's share.js)
-        run: gradle --no-daemon :share:test
+        run: gradle --no-daemon :share:test :core:test
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
