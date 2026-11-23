@@ -64,7 +64,7 @@ object Ops {
         }
         ticker.start()
         val r = try {
-            if (move) FileOps.move(sources, dest, resolve, prog) { cancel } else FileOps.copy(sources, dest, resolve, prog) { cancel }
+            if (move) FileOps.move(sources, dest, resolve, prog, canceled = { cancel }) else FileOps.copy(sources, dest, resolve, prog, canceled = { cancel })
         } finally { ticker.interrupt() }
         val msg = buildString {
             append("${r.done.size} item(s) ${if (move) "moved" else "copied"}")
