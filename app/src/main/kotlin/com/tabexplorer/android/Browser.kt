@@ -166,8 +166,8 @@ fun BrowserScreen(nav: Nav, dir: File, snack: SnackbarHostState) {
             val sel = selected.toList()
             Surface(tonalElevation = 3.dp) {
                 Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    BarButton(Icons.Filled.ContentCopy, "Copy") { Clipboard.files = sel; Clipboard.move = false; selected = emptySet(); app.say("${sel.size} copied. Open a folder and tap Paste.") }
-                    BarButton(Icons.Filled.ContentCut, "Move") { Clipboard.files = sel; Clipboard.move = true; selected = emptySet(); app.say("${sel.size} ready to move. Open a folder and tap Paste.") }
+                    BarButton(Icons.Filled.ContentCopy, "Copy") { Clipboard.files = sel; Clipboard.move = false; selected = emptySet() }
+                    BarButton(Icons.Filled.ContentCut, "Move") { Clipboard.files = sel; Clipboard.move = true; selected = emptySet() }
                     BarButton(Icons.Filled.Delete, "Delete") {
                         scope.launch {
                             val trashed = withContext(Dispatchers.IO) { sel.mapNotNull { runCatching { app.bin.trash(it) }.getOrNull() } }
