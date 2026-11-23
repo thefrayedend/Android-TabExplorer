@@ -149,6 +149,8 @@ fun BrowserScreen(nav: Nav, dir: File, snack: SnackbarHostState) {
 
         // what is running now
         op?.let { s ->
+            // a finished message goes away by itself
+            if (s.finished) LaunchedEffect(s) { kotlinx.coroutines.delay(6000); Ops.dismiss() }
             Surface(tonalElevation = 3.dp) {
                 Column(Modifier.fillMaxWidth().padding(12.dp)) {
                     if (s.finished) {

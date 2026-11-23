@@ -25,6 +25,26 @@ class AppTest {
         File(root, "a.txt").writeText("hello a"); File(root, "b.txt").writeText("hello b")
         App.instance.bin.empty()
         App.instance.prefs.showHidden = false
+        Clipboard.files = emptyList()
+        Ops.dismiss()
+    }
+
+    /** A finished copy leaves a message at the bottom for a few seconds; the buttons must still work under it. */
+    @Test fun bottomButtonsWorkWhileACopyMessageShows() {
+        openRoot()
+        rule.onNodeWithText("b.txt").performTouchInput { longClick() }
+        rule.onNodeWithText("Copy").performClick()
+        rule.onNodeWithText("sub").performClick()
+        waitText("This folder is empty")
+        rule.onNodeWithText("Paste here").performClick()
+        waitText("item(s) copied")
+        rule.onNodeWithContentDescription("Back").performClick()
+        waitText("a.txt")
+        rule.onNodeWithText("a.txt").performTouchInput { longClick() }
+        waitText("1 selected")
+        rule.onNodeWithText("Delete").performClick()
+        waitGone("a.txt")
+        assertFalse(File(root, "a.txt").exists())
     }
 
     private fun openRoot() {
