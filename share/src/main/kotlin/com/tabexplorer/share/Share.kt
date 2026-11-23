@@ -96,14 +96,14 @@ class Share(
             val ss = try { ServerSocket(tcpPort) } catch (e: java.net.BindException) { ServerSocket(0) }
             server = ss
             port = ss.localPort
+            running = true
             pool.execute { acceptLoop(ss) }
             val u = MulticastSocket(null)
             u.reuseAddress = true
             u.bind(InetSocketAddress(udpPort))
-            try { u.broadcast = true; u.timeToLive = 1; u.loopbackMode = false } catch (_: Exception) { }
+            try { u.broadcast = true; u.timeToLive = 1 } catch (_: Exception) { }
             udp = u
             join()
-            running = true
             pool.execute { udpLoop(u) }
             log("share: on as \"$deviceName\" (code $code), files on TCP $port")
             announce("who")
@@ -261,7 +261,7 @@ class Share(
         if (job.items.size > MAX_ITEMS) throw ShareException("That is too many files to send at once.")
         val name = peer.name
         val sock = Socket()
-        val ch = Channel(sock)
+        var chOpt: Channel? = null
         try {
             try { sock.connect(InetSocketAddress(peer.address, peer.port), connectTimeoutMs) } catch (e: java.net.SocketTimeoutException) {
                 val seen = System.currentTimeMillis() - peer.lastSeen < ONLINE_MS
@@ -271,6 +271,8 @@ class Share(
                 throw ShareException("Couldn't reach $name: it isn't taking files right now (is TabExplorer open there, with sharing on?)")
             }
             sock.tcpNoDelay = true
+            val ch = Channel(sock)
+            chOpt = ch
             val nonceC = Crypto.random(16)
             ch.send(obj("t" to "hello", "v" to 1, "id" to identity.id, "name" to deviceName, "pub" to identity.pub, "nonce" to Crypto.hex(nonceC)))
             val hi = ch.json(10_000)
@@ -338,7 +340,7 @@ class Share(
         } catch (e: java.net.SocketException) {
             if (job.canceled) return
             throw ShareException("The connection to $name was cut off: the connection was cut off")
-        } finally { ch.close() }
+        } finally { chOpt?.close() ?: try { sock.close() } catch (_: Exception) { } }
     }
 
     // ------------------------------------------------------------ receiving
