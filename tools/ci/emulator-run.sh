@@ -2,6 +2,7 @@
 # Runs on the build machine while the emulator is up: starts TabExplorer's real sharing code as a PC,
 # runs the instrumented tests (the app on the emulator), and has the PC send to the phone while they run.
 set -u
+trap 'pkill -f interop.js 2>/dev/null; kill $(jobs -p) 2>/dev/null; adb forward --remove-all 2>/dev/null; true' EXIT
 cd "$(dirname "$0")/../.."
 W=$(mktemp -d)
 mkdir -p "$W/out" "$W/pcfiles/FromPc"
@@ -34,7 +35,7 @@ gradle --no-daemon :app:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.pcPub="$PCPUB" \
   -Pandroid.testInstrumentationRunnerArguments.pcPort=47600
 RC=$?
-wait $SENDER 2>/dev/null
+kill $SENDER 2>/dev/null; wait $SENDER 2>/dev/null
 echo "--- the PC that received from the phone:"; (cd "$W/out" && find . -type f | sort)
 echo "--- PC sender log:"; cat "$W/send.log" "$W/send.err" 2>/dev/null | tail -15
 [ -f "$W/out/Photos/a.txt" ] && [ "$(cat "$W/out/Photos/a.txt")" = "alpha from the phone" ] && [ "$(stat -c %s "$W/out/Photos/2026/b.bin")" = "600000" ] || { echo "FILES FROM THE PHONE DID NOT ARRIVE"; RC=1; }
