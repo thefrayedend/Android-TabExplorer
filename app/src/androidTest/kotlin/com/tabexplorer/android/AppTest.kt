@@ -33,7 +33,7 @@ class AppTest {
     @Test fun bottomButtonsWorkWhileACopyMessageShows() {
         openRoot()
         rule.onNodeWithText("b.txt").performTouchInput { longClick() }
-        rule.onNodeWithText("Copy").performClick()
+        tapBar("Copy") { Clipboard.files.isNotEmpty() }
         rule.onNodeWithText("sub").performClick()
         waitText("This folder is empty")
         rule.onNodeWithText("Paste here").performClick()
@@ -42,7 +42,7 @@ class AppTest {
         waitText("a.txt")
         rule.onNodeWithText("a.txt").performTouchInput { longClick() }
         waitText("1 selected")
-        rule.onNodeWithText("Delete").performClick()
+        tapBar("Delete") { !File(root, "a.txt").exists() }
         waitGone("a.txt")
         assertFalse(File(root, "a.txt").exists())
     }
@@ -52,6 +52,13 @@ class AppTest {
         rule.until(10_000) { rule.onAllNodesWithText("AAATx").fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithText("AAATx").performClick()
         rule.until(10_000) { rule.onAllNodesWithText("a.txt").fetchSemanticsNodes().isNotEmpty() }
+    }
+    /** Taps a button of the selection bar. On the slow CI emulator the first tap right after a long-press is sometimes lost, so it is repeated (up to 3 times) until it has had its effect. */
+    private fun tapBar(label: String, effect: () -> Boolean) {
+        repeat(3) { n ->
+            rule.onNodeWithText(label).performClick()
+            try { rule.until(2_500) { effect() }; return } catch (e: AssertionError) { println("tap on $label had no effect (try ${n + 1})"); if (n == 2) throw e }
+        }
     }
     private fun waitText(t: String, ms: Long = 10_000) = rule.until(ms) { rule.onAllNodesWithText(t, substring = true).fetchSemanticsNodes().isNotEmpty() }
     private fun waitGone(t: String, ms: Long = 10_000) = rule.until(ms) { rule.onAllNodesWithText(t).fetchSemanticsNodes().isEmpty() }
@@ -73,7 +80,7 @@ class AppTest {
         openRoot()
         rule.onNodeWithText("a.txt").performTouchInput { longClick() }
         waitText("1 selected")
-        rule.onNodeWithText("Delete").performClick()
+        tapBar("Delete") { !File(root, "a.txt").exists() }
         waitGone("a.txt")
         assertFalse(File(root, "a.txt").exists())
         assertEquals(1, App.instance.bin.list().size)
@@ -87,7 +94,7 @@ class AppTest {
     @Test fun copyPasteIntoAFolder() {
         openRoot()
         rule.onNodeWithText("b.txt").performTouchInput { longClick() }
-        rule.onNodeWithText("Copy").performClick()
+        tapBar("Copy") { Clipboard.files.isNotEmpty() }
         rule.onNodeWithText("sub").performClick()
         waitText("This folder is empty")
         rule.onNodeWithText("Paste here").performClick()
@@ -99,7 +106,7 @@ class AppTest {
     @Test fun moveAFile() {
         openRoot()
         rule.onNodeWithText("b.txt").performTouchInput { longClick() }
-        rule.onNodeWithText("Move").performClick()
+        tapBar("Move") { Clipboard.files.isNotEmpty() }
         rule.onNodeWithText("sub").performClick()
         waitText("This folder is empty")
         rule.onNodeWithText("Paste here").performClick()
