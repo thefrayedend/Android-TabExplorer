@@ -35,7 +35,7 @@ gradle --no-daemon :app:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.pcPub="$PCPUB" \
   -Pandroid.testInstrumentationRunnerArguments.pcPort=47600
 RC=$?
-echo "--- logcat (errors, our app, crashes):"; adb logcat -d -v time 2>/dev/null | grep -E "AndroidRuntime|FATAL|ForegroundService|com.tabexplorer|ANR in|Process.*died|Input dispatching" | grep -v "chatty" | tail -80 | cut -c1-300
+echo "--- logcat (crashes and exceptions):"; adb logcat -d -v time 2>/dev/null | grep -E -A12 "FATAL EXCEPTION|ForegroundServiceStartNotAllowed|SecurityException|IllegalStateException|OpService|Ops\b" | head -150 | cut -c1-260
 kill $SENDER 2>/dev/null; wait $SENDER 2>/dev/null
 echo "--- the PC that received from the phone:"; (cd "$W/out" && find . -type f | sort)
 echo "--- PC sender log:"; cat "$W/send.log" "$W/send.err" 2>/dev/null | tail -15
