@@ -6,5 +6,5 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "TabExplorerAndroid"
-include(":share")
+include(":share", ":core")
 if (file("app/build.gradle.kts").exists()) include(":app")
