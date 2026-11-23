@@ -17,5 +17,5 @@ fun ComposeTestRule.until(ms: Long, cond: () -> Boolean) {
 fun screenTexts(): String = try {
     val out = java.io.ByteArrayOutputStream()
     androidx.test.uiautomator.UiDevice.getInstance(androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()).dumpWindowHierarchy(out)
-    Regex("(?:text|content-desc|package)=\"([^\"]+)\"").findAll(out.toString()).map { it.groupValues[1] }.joinToString(" | ")
+    Regex("<node [^>]*?(?:text|content-desc)=\"([^\"]+)\"[^>]*?bounds=\"([^\"]+)\"").findAll(out.toString()).map { it.groupValues[1] + "@" + it.groupValues[2] }.joinToString(" | ")
 } catch (e: Exception) { "(couldn't read the screen: ${e.message})" }
