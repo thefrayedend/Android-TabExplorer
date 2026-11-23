@@ -1,0 +1,16 @@
+{
+  "privA": "a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac4",
+  "privB": "4b66e9d4d1b4673c5ad22691957d6af5c11b6421e0ea01d42ca4169e7918ba0d",
+  "pubA": "MCowBQYDK2VuAyEAHJ/Yj0VgbZMqgMcYJK4VHRXXPnfeOOjgAIUuYU+ucBk=",
+  "pubB": "MCowBQYDK2VuAyEA/2P+V7+/Q/o/VjYosUmvcE09tiU2nEmYNlA0empx4A4=",
+  "codeA": "3973 3130",
+  "codeB": "7560 8228",
+  "secret": "739311d35d8d3c41da4062c799a6c748808a31343facaaa7aa7e311908c1846e",
+  "nonceC": "000102030405060708090a0b0c0d0e0f",
+  "nonceS": "f0e0d0c0b0a090807060504030201000",
+  "c2s": "773b88bcad1451f4bd18e2705b5afbb91b22b3d8be9cca2cc38283b737a6bfbf",
+  "s2c": "57dd209e6977ae52590de5ed06bd76f3f47f157ff4b2a0de9e0fafa62cd3b958",
+  "sealedJson0": "9021a8e51fbb42bd22845fb202be47bffae270c851492a82279a0d861fd53c4179cc357cf74693c2",
+  "json": "{\"t\":\"offer\",\"count\":1}",
+  "sealedData1": "2e265041ba0b454f48a405229dd89654ae916e9a0b66c1346629da5f3f9f61d7"
+}
